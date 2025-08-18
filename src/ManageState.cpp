@@ -17,7 +17,7 @@ const uint8_t servoPins[4] = {5, 6, 9, 10};
 
 // servoSpeed => Can be adjusted based on your Pedro Robot's movement. 
 // Higher values result in faster movement, lower values result in slower movement.
-const int servoSpeed[4] = {-150, -150, 150, 100};
+const int servoSpeed[4] = {-200, -250, 200, 150};
 ////////////
 
 Servo servoList[4];
@@ -214,13 +214,13 @@ void ManageState::screenSelectMode() {
         } else if (m_selectMode == 3) {
             m_manageDisplay->setModeActivated(MODE_REPEAT);
             m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
-        } else if (m_selectMode == 4) {
+        } /*else if (m_selectMode == 4) {
             m_manageDisplay->setDisplayScreen (SCREEN_RADIO);
         } else if (m_selectMode == 5) {
             m_manageDisplay->setModeActivated(MODE_USB);
         } else if (m_selectMode == 6) {
             m_manageDisplay->setModeActivated(MODE_BLUETOOTH);
-        }
+        }*/
         m_fromSelectMode = true;
         m_manageButton->setBtnCenterPressed(false);
         m_manageButton->setBtnCenterReleased(false);
@@ -228,7 +228,8 @@ void ManageState::screenSelectMode() {
 
     if (m_isPressBtnRight) {
         if (not m_isBtnRightOn) {
-            if (m_selectMode < 6) {
+           // if (m_selectMode < 6) {
+            if (m_selectMode < 3) {
                 m_selectMode++;
             }
             m_isBtnRightOn = true;
