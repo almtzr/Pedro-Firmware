@@ -95,9 +95,9 @@ void ManageDisplay::screenSelectMode() {
         oledControl();
         oledRecord();
         oledRepeat();
-        oledRadio();
-        oledUSB();
-        oledBluetooth();
+        //oledRadio();
+        //oledUSB();
+        //oledBluetooth();
         u8g.setColorIndex(1);
 
     } while( u8g.nextPage() );

@@ -57,7 +57,7 @@ if ((millis() - m_lastDebounceTime) > DEBOUNCE_DELAY) {
 
   // Vérification d'un appui long pendant que le bouton est maintenu appuyé
   if (m_buttonHeld && m_stateBtnCenter == HIGH) {
-    if ((millis() - m_pressStartTime) >= 3000 && !m_btnCenterLongPress) {
+    if ((millis() - m_pressStartTime) >= 2000 && !m_btnCenterLongPress) {
       m_btnCenterLongPress = true;
       Serial.println("Appui long détecté");
       m_buttonHeld = false;
