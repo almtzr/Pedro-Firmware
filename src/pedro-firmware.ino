@@ -43,5 +43,5 @@ void loop() {
   manageButton.updateBtnState ();
   manageDisplay.updateScreen ();
   manageState.updateState (&manageButton, &manageDisplay);
-  modeRadio.communicationRadio (&manageState, &radio);
+  //modeRadio.communicationRadio (&manageState, &radio);
 }

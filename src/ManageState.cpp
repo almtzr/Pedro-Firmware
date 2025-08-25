@@ -113,25 +113,27 @@ void ManageState::screenControl() {
         m_manageDisplay->setDisplayScreen (SCREEN_SETTINGS);
         
     } else {
-        if (m_isBtnCenterReleased and not m_fromSelectMode) {
-            digitalWrite(ledPins[m_currentLed], LOW);
-            m_currentLed = (m_currentLed + 1) % 4;
-            digitalWrite(ledPins[m_currentLed], HIGH);
-            m_manageButton->setBtnCenterReleased(false);
-            delay(200);
-        }
+        if (m_selectMode == 1 || m_selectMode == 2) {
 
-        if (m_fromSelectMode) {
-            m_fromSelectMode = false;
-        }
+            if (m_isBtnCenterReleased and not m_fromSelectMode) {
+                digitalWrite(ledPins[m_currentLed], LOW);
+                m_currentLed = (m_currentLed + 1) % 4;
+                digitalWrite(ledPins[m_currentLed], HIGH);
+                m_manageButton->setBtnCenterReleased(false);
+                delay(200);
+            }
 
-        if (m_isPressBtnRight) {
-            pulse = 1500 + servoSpeed[m_currentLed];
-        } else if (m_isPressBtnLeft) {
-            pulse = 1500 - servoSpeed[m_currentLed];
-        } 
+            if (m_fromSelectMode) {
+                m_fromSelectMode = false;
+            }
+
+            if (m_isPressBtnRight) {
+                pulse = 1500 + servoSpeed[m_currentLed];
+            } else if (m_isPressBtnLeft) {
+                pulse = 1500 - servoSpeed[m_currentLed];
+            } 
     
-        if (m_selectMode == 2) {   
+           
           if (m_startRecord) {
             m_movementIndex = 0;
             m_lastChange = millis();
@@ -145,17 +147,43 @@ void ManageState::screenControl() {
             m_lastChange = now;
             m_lastPulse = pulse;
           }
+          
+          servoList[m_currentLed].writeMicroseconds(pulse);
+
         } else if (m_selectMode == 3) {
           do {
             replayMovements();
           } while (not digitalRead(BTNCENTER));
         } else if (m_selectMode == 4) {
-          
-            
-        }
-    }
+            while (Serial.available()) {
+                char c = Serial.read();
+                static String command = "";
 
-    servoList[m_currentLed].writeMicroseconds(pulse);
+                if (c == '\n') {
+                    int servoNum = command.charAt(0) - '1';
+                    char direction = command.charAt(1);
+
+                    // DEBUG
+                    Serial.print("Dir: ");
+                    Serial.println(direction);
+
+                    for (int i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
+                    if (servoNum >= 0 && servoNum < 4) digitalWrite(ledPins[servoNum], HIGH);
+
+                    if (servoNum >= 0 && servoNum < 4) {
+                        if (direction == 'L') servoList[servoNum].writeMicroseconds(1500 + servoSpeed[servoNum]);
+                        else if (direction == 'R') servoList[servoNum].writeMicroseconds(1500 - servoSpeed[servoNum]);
+                        else if (direction == 'I') for (int i = 0; i < 4; i++) servoList[i].writeMicroseconds(1500);
+                    }
+
+                    command = ""; // reset pour le prochain message
+                } else {
+                    command += c;
+                }
+            }
+        }
+
+    }
 
 }
 
@@ -214,6 +242,9 @@ void ManageState::screenSelectMode() {
         } else if (m_selectMode == 3) {
             m_manageDisplay->setModeActivated(MODE_REPEAT);
             m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
+        } else if (m_selectMode == 4) {
+            m_manageDisplay->setModeActivated(MODE_WEBCTRL);
+            m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
         } /*else if (m_selectMode == 4) {
             m_manageDisplay->setDisplayScreen (SCREEN_RADIO);
         } else if (m_selectMode == 5) {
@@ -229,7 +260,7 @@ void ManageState::screenSelectMode() {
     if (m_isPressBtnRight) {
         if (not m_isBtnRightOn) {
            // if (m_selectMode < 6) {
-            if (m_selectMode < 3) {
+            if (m_selectMode < 4) {
                 m_selectMode++;
             }
             m_isBtnRightOn = true;

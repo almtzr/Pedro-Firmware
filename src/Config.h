@@ -4,12 +4,13 @@
 #include <Servo.h>
 
 
-#define RELEASE "v.1.0" 
+#define RELEASE "v.1.0.2" 
 
 #define MODE_CONTROL "NORMAL" 
 #define MODE_RECORD "RECORD" 
 #define MODE_REPEAT "REPEAT" 
 #define MODE_USB "USB" 
+#define MODE_WEBCTRL "WEB CTRL" 
 #define MODE_RADIO "RADIO" 
 #define MODE_BLUETOOTH "BLUETOOTH" 
 #define MODE_WIFI "WIFI" 

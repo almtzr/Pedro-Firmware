@@ -42,6 +42,10 @@ void ManageDisplay::oledRepeat() {
     menuPosition (3,"REPEAT",3,3,SCREEN_SIZE_X/2.8); 
 }
 
+void ManageDisplay::oledWebControl() {  
+    menuPosition (4,"WEBCTRL",50,1,SCREEN_SIZE_X/2.4); 
+}
+
 void ManageDisplay::oledRadio() {  
     menuPosition (4,"RADIO",58,1,SCREEN_SIZE_X/3.3); 
 }
@@ -95,6 +99,7 @@ void ManageDisplay::screenSelectMode() {
         oledControl();
         oledRecord();
         oledRepeat();
+        oledWebControl();
         //oledRadio();
         //oledUSB();
         //oledBluetooth();
@@ -171,8 +176,10 @@ void ManageDisplay::updateScreen () {
     } else if (m_currentScreen == 2) {
         screenSelectMode ();
         m_getScreen = 2;
-    }  else if (m_currentScreen == 3) {
+    }  /*else if (m_currentScreen == 3) {
         screenRadio ();
         m_getScreen = 3;
-    }    
+    }  else if (m_currentScreen == 4) {
+        screenRadio ();
+        m_getScreen = 3;  */  
 }
