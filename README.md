@@ -1,7 +1,7 @@
 # Pedro-Firmware
 
 ## Description
-[Pedro](https://github.com/almtzr/Pedro) est un robot éducatif open-source. Ce dépôt contient le code source du firmware pour la carte Pedro.
+[Pedro](https://pedrobot.com) est un robot éducatif open-source. Ce dépôt contient le code source du firmware pour la carte Pedro.
 
 ## Installation de la bibliothèque Arduino
 1. Téléchargez le fichier `Pedro.zip` du dossier `libraries/`.
