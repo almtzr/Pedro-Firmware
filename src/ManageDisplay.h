@@ -18,7 +18,6 @@ class ManageDisplay {
             void oledRepeat ();
             void oledRadio ();
             void oledWebControl ();
-            void oledUSB ();
             void oledBluetooth ();
             void oledRadioType ();
             void oledRadioKey ();

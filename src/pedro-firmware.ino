@@ -27,6 +27,7 @@ const uint64_t pipeA = 0xE8E8F0F0E1LL;
 
 void setup() {
   Serial.begin(9600);  
+  Serial1.begin(9600);  
   
   radio.begin();
   radio.setAutoAck(false);

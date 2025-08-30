@@ -17,7 +17,7 @@ const uint8_t servoPins[4] = {5, 6, 9, 10};
 
 // servoSpeed => Can be adjusted based on your Pedro Robot's movement. 
 // Higher values result in faster movement, lower values result in slower movement.
-const int servoSpeed[4] = {-200, -250, 200, 150};
+const int servoSpeed[4] = {-200, -220, 200, 150};
 ////////////
 
 Servo servoList[4];
@@ -181,6 +181,43 @@ void ManageState::screenControl() {
                     command += c;
                 }
             }
+        }  else if (m_selectMode == 5) {
+            int servoNum, rotation;
+            String receivedData = "";
+            while (Serial1.available()) {
+                char c = Serial1.read();  
+                if (c == '\n') break; 
+                receivedData += c; 
+                
+                if (receivedData == "1") {
+                    servoNum = 0;
+                } else if (receivedData == "2") {
+                    servoNum = 1;
+                } else if (receivedData == "3") {
+                    servoNum = 2;
+                } else if (receivedData == "4") {
+                    servoNum = 3;
+                }
+                for (int i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
+                if (servoNum >= 0 && servoNum < 4) digitalWrite(ledPins[servoNum], HIGH); 
+
+                if (receivedData == "5") {
+                    rotation = 10;
+                } else if (receivedData == "6") {
+                    rotation = 20;
+                } else if (receivedData == "7") {
+                    rotation = 30;
+                }  
+                
+                if (rotation == 10) {
+                    servoList[servoNum].writeMicroseconds(1500 + servoSpeed[servoNum]);
+                } else if (rotation == 20) {
+                    servoList[servoNum].writeMicroseconds(1500 - servoSpeed[servoNum]);
+                } else if (rotation == 30) {
+                    servoList[servoNum].writeMicroseconds(1500);
+                }
+
+            }
         }
 
     }
@@ -245,12 +282,11 @@ void ManageState::screenSelectMode() {
         } else if (m_selectMode == 4) {
             m_manageDisplay->setModeActivated(MODE_WEBCTRL);
             m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
-        } /*else if (m_selectMode == 4) {
-            m_manageDisplay->setDisplayScreen (SCREEN_RADIO);
         } else if (m_selectMode == 5) {
-            m_manageDisplay->setModeActivated(MODE_USB);
-        } else if (m_selectMode == 6) {
             m_manageDisplay->setModeActivated(MODE_BLUETOOTH);
+            m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
+        } /*else if (m_selectMode == 6) {
+            m_manageDisplay->setDisplayScreen (SCREEN_RADIO);
         }*/
         m_fromSelectMode = true;
         m_manageButton->setBtnCenterPressed(false);
@@ -260,7 +296,7 @@ void ManageState::screenSelectMode() {
     if (m_isPressBtnRight) {
         if (not m_isBtnRightOn) {
            // if (m_selectMode < 6) {
-            if (m_selectMode < 4) {
+            if (m_selectMode < 5) {
                 m_selectMode++;
             }
             m_isBtnRightOn = true;

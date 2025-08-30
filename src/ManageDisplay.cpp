@@ -46,16 +46,12 @@ void ManageDisplay::oledWebControl() {
     menuPosition (4,"WEBCTRL",50,1,SCREEN_SIZE_X/2.4); 
 }
 
-void ManageDisplay::oledRadio() {  
-    menuPosition (4,"RADIO",58,1,SCREEN_SIZE_X/3.3); 
-}
-
-void ManageDisplay::oledUSB() {  
-    menuPosition (5,"USB",58,2,SCREEN_SIZE_X/4.8); 
-}
-
 void ManageDisplay::oledBluetooth() {  
-    menuPosition (6,"BLUETOOTH",58,3,SCREEN_SIZE_X/1.9); 
+    menuPosition (5,"BLUETOOTH",50,2,SCREEN_SIZE_X/1.9); 
+}
+
+void ManageDisplay::oledRadio() {  
+    menuPosition (6,"RADIO",58,1,SCREEN_SIZE_X/3.3); 
 }
 
 void ManageDisplay::screenIntro() {  
@@ -100,9 +96,8 @@ void ManageDisplay::screenSelectMode() {
         oledRecord();
         oledRepeat();
         oledWebControl();
+        oledBluetooth();
         //oledRadio();
-        //oledUSB();
-        //oledBluetooth();
         u8g.setColorIndex(1);
 
     } while( u8g.nextPage() );
