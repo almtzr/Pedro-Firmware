@@ -24,7 +24,7 @@ class ManageState {
     uint8_t getRadioType ();
 
   private:
-    uint8_t m_currentScreen, m_selectMode, m_currentLed, m_movementIndex, m_radioType;
+    uint8_t m_currentScreen, m_selectMode, m_selectRadio, m_radioKey, m_currentLed, m_movementIndex, m_radioType;
     int m_intervalIntro, m_lastPulse;
     unsigned long m_previousMillis, m_lastChange;
     bool m_isPressBtnRight, m_isBtnRightOn;

@@ -1,13 +1,17 @@
 // =================================================================================
-//  File             : replayMode.ino
-//  Description      : Firmware for controlling the Pedro robot
-//                     in direct mode and replayMode with recording movements.
-//  Supported Boards : Rev2 and Rev3
+//  File             : PedroRobot.ino
+//  Description      : Firmware for controlling the Pedro robot:
+//                     1- Normal mode
+//                     2- Recording mode
+//                     3- Replay mode
+//                     4- Bluetooth mode
+//                     6- IHM Web Controller mode
+//  Supported Boards : Pedro Rev3
 //  Servo Type       : 360° SG90 or MG90
 //
 //  Author           : Almoutazar SAANDI
-//  Date             : May 18, 2025
-//  Last Update      : v1.0.0
+//  Date             : Sep 1, 2025
+//  Last Update      : v1.0.3
 // =================================================================================
 
 #include <RF24.h>
@@ -32,9 +36,9 @@ void setup() {
   radio.begin();
   radio.setAutoAck(false);
   radio.setDataRate(RF24_2MBPS);  //RF24_250KBPS, RF24_1MBPS, RF24_2MBPS
-  radio.openReadingPipe(1,pipeA);
   radio.setChannel(120); //2400 + 120 = 2520MHz 76 default
-  radio.startListening();
+  //radio.openReadingPipe(1,pipeA);
+  //radio.startListening();
   
   manageState.Init ();
 
@@ -44,5 +48,5 @@ void loop() {
   manageButton.updateBtnState ();
   manageDisplay.updateScreen ();
   manageState.updateState (&manageButton, &manageDisplay);
-  //modeRadio.communicationRadio (&manageState, &radio);
+  modeRadio.communicationRadio (&manageState, &radio);
 }

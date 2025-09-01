@@ -28,6 +28,8 @@ ManageState::ManageState() {
     m_intervalIntro = 3000;
     m_lastPulse = 1500;
     m_selectMode = 1;
+    m_selectRadio = 1; 
+    m_radioKey = 1;
     m_currentLed = 0;
     m_lastChange = 0;
     m_radioType = 1;
@@ -82,17 +84,6 @@ void ManageState::updateState(ManageButton * manageButton, ManageDisplay * manag
     } else if (m_currentScreen == 3) {
         screenRadio ();
     }     
-}
-
-void ManageState::screenRadio() {  
-    if (m_isBtnCenterReleased) {
-        m_manageButton->setBtnCenterReleased(false);
-        if (m_radioType == 1){
-            m_manageDisplay->setRadioType(2);
-        } else if (m_radioType == 2){
-            m_manageDisplay->setRadioType(1);
-        } 
-    }
 }
 
 void ManageState::screenIntro() {  
@@ -216,12 +207,10 @@ void ManageState::screenControl() {
                 } else if (rotation == 30) {
                     servoList[servoNum].writeMicroseconds(1500);
                 }
-
             }
         }
-
     }
-
+  //  m_manageDisplay->setModeSelected (m_selectMode);
 }
 
 
@@ -285,9 +274,9 @@ void ManageState::screenSelectMode() {
         } else if (m_selectMode == 5) {
             m_manageDisplay->setModeActivated(MODE_BLUETOOTH);
             m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
-        } /*else if (m_selectMode == 6) {
+        } else if (m_selectMode == 6) {
             m_manageDisplay->setDisplayScreen (SCREEN_RADIO);
-        }*/
+        }
         m_fromSelectMode = true;
         m_manageButton->setBtnCenterPressed(false);
         m_manageButton->setBtnCenterReleased(false);
@@ -295,8 +284,7 @@ void ManageState::screenSelectMode() {
 
     if (m_isPressBtnRight) {
         if (not m_isBtnRightOn) {
-           // if (m_selectMode < 6) {
-            if (m_selectMode < 5) {
+            if (m_selectMode < 6) {
                 m_selectMode++;
             }
             m_isBtnRightOn = true;
@@ -317,4 +305,54 @@ void ManageState::screenSelectMode() {
 
     m_manageDisplay->setModeSelected (m_selectMode);
 
+}
+
+void ManageState::screenRadio() {  
+    if (m_isPressBtnRight) {
+        if (m_selectRadio == 1) {
+            if (m_radioType == 1){
+                m_manageDisplay->setRadioType(2);
+            } else if (m_radioType == 2) {
+                m_manageDisplay->setRadioType(1);
+            } 
+        } else if (m_selectRadio == 2) {
+            if (m_radioKey < 100) {
+                m_radioKey++;
+            } 
+        }
+    }
+
+    if (m_isPressBtnLeft) {
+        if (m_selectRadio == 2) {
+            if (m_radioKey > 1) {
+                m_radioKey--;
+            } 
+        }
+    }
+
+    if (m_isBtnCenterPressed) {
+        if (m_selectRadio < 3) {
+            m_selectRadio++;
+        } else if (m_selectRadio == 3) {
+            String radioMode;
+            char buffer[4];
+            sprintf(buffer, "%d", m_radioKey);
+
+            if (m_radioType == 1){
+                radioMode = String("RadioTX ") + buffer;
+            } else if (m_radioType == 2) {
+                radioMode = String("RadioRX ") + buffer;
+            }
+            
+            m_manageDisplay->setModeActivated(radioMode);
+
+            m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
+        }   
+
+        m_manageButton->setBtnCenterPressed (false);
+        m_manageButton->setBtnCenterReleased (false);
+    }
+
+    m_manageDisplay->setRadioSelected (m_selectRadio);
+    m_manageDisplay->setRadioKey (m_radioKey);
 }

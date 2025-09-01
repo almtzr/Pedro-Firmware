@@ -1,7 +1,0 @@
-Pedro_v1.0.0.zip/
-├── src/
-│   ├── pedro_motor.cpp
-│   ├── pedro_motor.h
-│   ├── pedro_io.cpp
-│   └── pedro_io.h
-└── library.properties

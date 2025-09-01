@@ -14,7 +14,9 @@ ManageDisplay::ManageDisplay() {
     m_currentScreen = DEFAULT_SCREEN;
     m_getScreen = m_currentScreen;
     m_mode_activated = MODE_CONTROL;  
-    m_modeSelected = 1; 
+    m_modeSelected = 1;
+    m_selectRadio = 1;
+    m_radioKey = 1; 
 }
 
 
@@ -51,7 +53,7 @@ void ManageDisplay::oledBluetooth() {
 }
 
 void ManageDisplay::oledRadio() {  
-    menuPosition (6,"RADIO",58,1,SCREEN_SIZE_X/3.3); 
+    menuPosition (6,"RADIO",50,3,SCREEN_SIZE_X/3.3); 
 }
 
 void ManageDisplay::screenIntro() {  
@@ -97,7 +99,7 @@ void ManageDisplay::screenSelectMode() {
         oledRepeat();
         oledWebControl();
         oledBluetooth();
-        //oledRadio();
+        oledRadio();
         u8g.setColorIndex(1);
 
     } while( u8g.nextPage() );
@@ -106,27 +108,48 @@ void ManageDisplay::screenSelectMode() {
 
 void ManageDisplay::oledRadioType() {  
 
-    u8g.drawBox(SCREEN_SIZE_X/3, SCREEN_SIZE_Y/2 - 12, SCREEN_SIZE_X/2 + 20, 15);
-    u8g.setColorIndex(1);
     u8g.setFont(u8g_font_7x13B);
-    if (m_radioType == 1) {
-        u8g.drawStr(SCREEN_SIZE_X/3 + 3, SCREEN_SIZE_Y/2, TYPE_TX);
-    } else  if (m_radioType == 2){
-        u8g.drawStr(SCREEN_SIZE_X/3 + 3, SCREEN_SIZE_Y/2, TYPE_RX);
-    }
-    u8g.setColorIndex(1);
 
+    if (m_selectRadio == 1) {
+        u8g.drawBox(SCREEN_SIZE_X/3, SCREEN_SIZE_Y/2 - 12, SCREEN_SIZE_X/2 + 20, 15);
+        u8g.setColorIndex(1);
+    } else {
+        u8g.setColorIndex(0);
+    }
+    if (m_radioType == 1) {
+        u8g.drawStr(SCREEN_SIZE_X/3 + 1, SCREEN_SIZE_Y/2, TYPE_TX);
+    } else  if (m_radioType == 2){
+        u8g.drawStr(SCREEN_SIZE_X/3 + 1, SCREEN_SIZE_Y/2, TYPE_RX);
+    }
 }
 
 void ManageDisplay::oledRadioKey() {  
 
-    if (m_radioType == 1) {
-        u8g.drawBox(0, LEVELWIDTH_ + 2, SCREEN_SIZE_X/2 - 8, 10);
-        u8g.setColorIndex(0);
-        u8g.drawStr(2, LEVELWIDTH_ + 10, TYPE_RX);
+    u8g.setFont(u8g_font_7x13B);
+
+    char buffer[4];
+    sprintf(buffer, "%d", m_radioKey);
+    
+    if (m_selectRadio == 2) {
+        u8g.drawBox(SCREEN_SIZE_X/3, SCREEN_SIZE_Y/1.3 - 12, SCREEN_SIZE_X/4, 15);
         u8g.setColorIndex(1);
+        u8g.drawStr(SCREEN_SIZE_X/3 + 1, SCREEN_SIZE_Y/1.3, buffer);
     } else {
-        u8g.drawStr(2, LEVELWIDTH_ + 10, TYPE_RX);
+        u8g.setColorIndex(0);
+        u8g.drawStr(SCREEN_SIZE_X/3 + 1, SCREEN_SIZE_Y/1.3, buffer);
+    }
+}
+
+void ManageDisplay::oledRadioOK() {  
+    
+    u8g.setFont(u8g_font_8x13B);
+    if (m_selectRadio == 3) {
+        u8g.drawBox(SCREEN_SIZE_X/2 + 19, SCREEN_SIZE_Y - 15, SCREEN_SIZE_X/4, 15);
+        u8g.setColorIndex(1);
+        u8g.drawStr(SCREEN_SIZE_X/2 + 24, SCREEN_SIZE_Y, "OK");
+    } else {
+        u8g.setColorIndex(0);
+        u8g.drawStr(SCREEN_SIZE_X/2 + 24, SCREEN_SIZE_Y, "OK");
     }
 }
 
@@ -138,15 +161,14 @@ void ManageDisplay::screenRadio() {
         u8g.setFont(u8g_font_8x13B);
         u8g.drawStr(2, 13, TITLE_RADIO);
         
-        u8g.setFont(u8g_font_8x13B);
         u8g.drawStr(2, SCREEN_SIZE_Y/2, "TYPE:");
-        u8g.setFont(u8g_font_8x13B);
-        u8g.drawStr(2, SCREEN_SIZE_Y - 10,"KEY:");
-        //u8g.setColorIndex(1);
-
+        u8g.drawStr(2, SCREEN_SIZE_Y/1.3,"KEY:");
 
         oledRadioType();
-       // oledRadioKey();
+        oledRadioKey();
+        oledRadioOK();
+        
+        u8g.setColorIndex(1);
     } while( u8g.nextPage() );
 }
 
@@ -154,6 +176,9 @@ uint8_t ManageDisplay::getScreen() { return m_getScreen; }
 void ManageDisplay::setDisplayScreen(uint8_t displayScreen) { m_currentScreen = displayScreen; }
 void ManageDisplay::setModeActivated(String modeActivated) { m_mode_activated = modeActivated; }
 void ManageDisplay::setModeSelected(uint8_t modeSelected) { m_modeSelected = modeSelected; }
+void ManageDisplay::setRadioKey(uint8_t radioKey) { m_radioKey = radioKey; }
+void ManageDisplay::setRadioSelected(uint8_t selectRadio) { m_selectRadio = selectRadio; }
+
 void ManageDisplay::setRadioType(uint8_t radioType) { m_radioType = radioType; }
 uint8_t ManageDisplay::getRadioType() { return m_radioType; }
 
@@ -171,10 +196,10 @@ void ManageDisplay::updateScreen () {
     } else if (m_currentScreen == 2) {
         screenSelectMode ();
         m_getScreen = 2;
-    }  /*else if (m_currentScreen == 3) {
+    } else if (m_currentScreen == 3) {
         screenRadio ();
         m_getScreen = 3;
-    }  else if (m_currentScreen == 4) {
+    }  /*else if (m_currentScreen == 4) {
         screenRadio ();
         m_getScreen = 3;  */  
 }

@@ -3,15 +3,18 @@
 //#include <RF24.h>
 
 const uint64_t pipeA = 0xE8E8F0F0E1LL;
+//RF24 radio(4, 12);
 
 ModeRadio::ModeRadio() {
   Serial.println("INIT RADIO");
-  /*
-  radio.begin();
-  radio.setAutoAck(false);
-  radio.setDataRate(RF24_2MBPS);
-  radio.setChannel(120);
-  */
+  
+//  radio.begin();
+//  radio.setAutoAck(false);
+//  radio.setDataRate(RF24_2MBPS);
+//  radio.setChannel(120);
+//      radio.openReadingPipe(1, pipeA);
+//      radio.startListening();
+  
 
   m_radioType = 1;
 }

@@ -21,10 +21,13 @@ class ManageDisplay {
             void oledBluetooth ();
             void oledRadioType ();
             void oledRadioKey ();
+            void oledRadioOK ();
             uint8_t getScreen ();
             void setDisplayScreen (uint8_t displayScreen);
             void setModeActivated(String modeActivated);
             void setModeSelected(uint8_t modeSelected);
+            void setRadioSelected(uint8_t selectRadio);
+            void setRadioKey(uint8_t radioKey);
             void setRadioType(uint8_t radioType);
             uint8_t getRadioType();
             void updateScreen ();
@@ -33,7 +36,7 @@ class ManageDisplay {
       private:
             uint8_t m_radioType;
             uint8_t m_currentScreen, m_getScreen;
-            uint8_t m_modeSelected;
+            uint8_t m_modeSelected, m_selectRadio, m_radioKey;
             String m_mode_activated;
 };
 
