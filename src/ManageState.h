@@ -28,11 +28,11 @@ class ManageState {
     void screenRadio ();
     void replayMovements ();
     uint8_t getRadioType (); 
+    uint8_t getRadioKey (); 
     uint8_t getSelectMode();
     uint8_t getCurrentScreen();
     Command getCommand() const;
     void setCommand(byte previous, byte current, byte rotation);
-    byte* getAddress() const;
 
   private:
     uint8_t m_currentScreen, m_selectMode, m_selectRadio, m_radioKey, m_currentLed, m_movementIndex, m_radioType;
@@ -42,8 +42,7 @@ class ManageState {
     bool m_isPressBtnLeft, m_isBtnLeftOn;
     bool m_isBtnCenterPressed, m_isBtnCenterLongPress, m_isBtnCenterReleased;
     bool m_startRecord, m_fromSelectMode;
-    Command cmd;
-    byte m_address[5];
+    Command m_cmd;
 };
 
 

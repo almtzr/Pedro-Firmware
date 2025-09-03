@@ -44,19 +44,9 @@ ManageState::ManageState() {
     m_startRecord = true;
     m_fromSelectMode = false;
 
-   /* m_address[0] = 'P';
-    m_address[1] = 'D';
-    m_address[2] = 'R';
-    m_address[3] = 'B';  */ 
-    m_address[0] = 4;
-    m_address[1] = 4;
-    m_address[2] = 4;
-    m_address[3] = 4;
-    m_address[4] = 0;
-
-    cmd.previousLed = 0;
-    cmd.currentLed = 0;
-    cmd.rotation = 0;
+    m_cmd.previousLed = 0;
+    m_cmd.currentLed = 0;
+    m_cmd.rotation = 0;
 }
 
 void ManageState::Init() {  
@@ -72,16 +62,14 @@ void ManageState::Init() {
 }
 
 uint8_t ManageState::getRadioType() { return m_radioType; }
+uint8_t ManageState::getRadioKey() { return m_radioKey; }
 uint8_t ManageState::getSelectMode() { return m_selectMode; }
 uint8_t ManageState::getCurrentScreen() { return m_currentScreen; }
-Command ManageState::getCommand() const { return cmd; }
+Command ManageState::getCommand() const { return m_cmd; }
 void ManageState::setCommand(byte previous, byte current, byte rotation) {
-    cmd.previousLed = previous;
-    cmd.currentLed = current;
-    cmd.rotation = rotation;
-}
-byte* ManageState::getAddress() const {
-    return m_address;
+    m_cmd.previousLed = previous;
+    m_cmd.currentLed = current;
+    m_cmd.rotation = rotation;
 }
 
 void ManageState::updateState(ManageButton * manageButton, ManageDisplay * manageDisplay) {  
@@ -122,7 +110,6 @@ void ManageState::screenIntro() {
 void ManageState::screenControl() {  
 
     int16_t pulse = 1500; // neutre
-    cmd.rotation = 2;
     m_selectRadio = 1;
 
     if (m_isBtnCenterLongPress) {
@@ -132,14 +119,15 @@ void ManageState::screenControl() {
         
     } else {
         if (m_selectMode == 1 || m_selectMode == 2  || (m_selectMode == 6 and m_radioType == 1)) {
-
+            
+            m_cmd.rotation = 2;
             if (m_isBtnCenterReleased and not m_fromSelectMode) {
-                cmd.previousLed = m_currentLed;
+                m_cmd.previousLed = m_currentLed;
                 digitalWrite(ledPins[m_currentLed], LOW);
                 m_currentLed = (m_currentLed + 1) % 4;
                 digitalWrite(ledPins[m_currentLed], HIGH);
                 m_manageButton->setBtnCenterReleased(false);
-                cmd.currentLed = m_currentLed;
+                m_cmd.currentLed = m_currentLed;
                 delay(200);
             }
 
@@ -149,10 +137,10 @@ void ManageState::screenControl() {
 
             if (m_isPressBtnRight) {
                 pulse = 1500 + servoSpeed[m_currentLed];
-                cmd.rotation = 10;
+                m_cmd.rotation = 10;
             } else if (m_isPressBtnLeft) {
                 pulse = 1500 - servoSpeed[m_currentLed];
-                cmd.rotation = 20;
+                m_cmd.rotation = 20;
             } 
     
            
@@ -242,16 +230,15 @@ void ManageState::screenControl() {
         } else if (m_selectMode == 6 and m_radioType == 2) {
             
             // Mise à jour LEDs
-            digitalWrite(ledPins[cmd.previousLed], LOW);
-            digitalWrite(ledPins[cmd.currentLed], HIGH);
-
+            digitalWrite(ledPins[m_cmd.previousLed], LOW);
+            digitalWrite(ledPins[m_cmd.currentLed], HIGH);
             // Mise à jour Servos
-            if (cmd.rotation == 10) {
-                servoList[cmd.currentLed].writeMicroseconds(1500 + servoSpeed[cmd.currentLed]);
-            } else if (cmd.rotation == 20) {
-                servoList[cmd.currentLed].writeMicroseconds(1500 - servoSpeed[cmd.currentLed]);
+            if (m_cmd.rotation == 10) {
+                servoList[m_cmd.currentLed].writeMicroseconds(1500 + servoSpeed[m_cmd.currentLed]);
+            } else if (m_cmd.rotation == 20) {
+                servoList[m_cmd.currentLed].writeMicroseconds(1500 - servoSpeed[m_cmd.currentLed]);
             } else {
-                servoList[cmd.currentLed].writeMicroseconds(1500);
+                servoList[m_cmd.currentLed].writeMicroseconds(1500);
             }
         }
     }
@@ -375,8 +362,6 @@ void ManageState::screenRadio() {
             } 
         }
     }
-
-    m_address[4] = m_radioKey; 
 
     if (m_isBtnCenterPressed) {
         if (m_selectRadio < 3) {

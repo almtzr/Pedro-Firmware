@@ -11,12 +11,14 @@ class ModeRadio {
   public:
     ModeRadio ();
     void Init ();
+    void stopRadio ();
     void communicationRadio(ManageState * manageState);
 
 
   private:
-   // RF24 radio = RF24(4, 12); // CE, CSN
     uint8_t m_radioType, m_selectMode, m_currentScreen;
+    bool m_radioActive;
+    byte m_radioKey;
     Command cmd;
 
 };
