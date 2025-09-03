@@ -11,8 +11,8 @@
 //  Servo Type       : 360° SG90 or MG90
 //
 //  Author           : Almoutazar SAANDI
-//  Date             : Sep 1, 2025
-//  Last Update      : v1.0.4
+//  Date             : Sep 4, 2025
+//  Last Update      : v1.0.3
 // =================================================================================
 
 #include <ManageDisplay.h>
