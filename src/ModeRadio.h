@@ -6,16 +6,19 @@
 #include <RF24.h>
 #include "ManageState.h"
 
+
 class ModeRadio {
   public:
     ModeRadio ();
-    void updateRadioMode();
-    void communicationRadio(ManageState * manageState, RF24 * radio);
+    void Init ();
+    void communicationRadio(ManageState * manageState);
+
 
   private:
    // RF24 radio = RF24(4, 12); // CE, CSN
-    uint8_t m_radioType;
-    
+    uint8_t m_radioType, m_selectMode, m_currentScreen;
+    Command cmd;
+
 };
 
 

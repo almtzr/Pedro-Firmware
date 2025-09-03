@@ -3,8 +3,7 @@
 #include <EEPROM.h>
 #include <Servo.h>
 
-
-#define RELEASE "v.1.0.3" 
+#define RELEASE "v.1.0.4" 
 
 #define MODE_CONTROL "NORMAL" 
 #define MODE_RECORD "RECORD" 

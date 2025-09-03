@@ -10,7 +10,7 @@ struct Movement {
   uint8_t servo;
 };
 
-Movement movements[100];
+Movement movements[50];
 
 const uint8_t ledPins[4] = {13, 11, 8, 7};
 const uint8_t servoPins[4] = {5, 6, 9, 10}; 
@@ -32,7 +32,7 @@ ManageState::ManageState() {
     m_radioKey = 1;
     m_currentLed = 0;
     m_lastChange = 0;
-    m_radioType = 1;
+    m_radioType = 0;
     m_movementIndex = 0;
     m_isPressBtnRight = false;
     m_isPressBtnLeft = false;
@@ -43,6 +43,20 @@ ManageState::ManageState() {
     m_isBtnLeftOn = false; 
     m_startRecord = true;
     m_fromSelectMode = false;
+
+   /* m_address[0] = 'P';
+    m_address[1] = 'D';
+    m_address[2] = 'R';
+    m_address[3] = 'B';  */ 
+    m_address[0] = 4;
+    m_address[1] = 4;
+    m_address[2] = 4;
+    m_address[3] = 4;
+    m_address[4] = 0;
+
+    cmd.previousLed = 0;
+    cmd.currentLed = 0;
+    cmd.rotation = 0;
 }
 
 void ManageState::Init() {  
@@ -58,6 +72,17 @@ void ManageState::Init() {
 }
 
 uint8_t ManageState::getRadioType() { return m_radioType; }
+uint8_t ManageState::getSelectMode() { return m_selectMode; }
+uint8_t ManageState::getCurrentScreen() { return m_currentScreen; }
+Command ManageState::getCommand() const { return cmd; }
+void ManageState::setCommand(byte previous, byte current, byte rotation) {
+    cmd.previousLed = previous;
+    cmd.currentLed = current;
+    cmd.rotation = rotation;
+}
+byte* ManageState::getAddress() const {
+    return m_address;
+}
 
 void ManageState::updateState(ManageButton * manageButton, ManageDisplay * manageDisplay) {  
     m_manageButton = manageButton;
@@ -75,8 +100,8 @@ void ManageState::updateState(ManageButton * manageButton, ManageDisplay * manag
     } else if (m_currentScreen == 1) {
         if (m_fromSelectMode) {
             m_manageButton->setBtnCenterReleased(false);
-            m_currentLed = -1;
-            digitalWrite(ledPins[m_currentLed], HIGH);
+           // m_currentLed = -1;
+          //  digitalWrite(ledPins[m_currentLed], HIGH);
         }
         screenControl ();
     } else if (m_currentScreen == 2) {
@@ -96,7 +121,9 @@ void ManageState::screenIntro() {
 
 void ManageState::screenControl() {  
 
-    int pulse = 1500; // neutre
+    int16_t pulse = 1500; // neutre
+    cmd.rotation = 2;
+    m_selectRadio = 1;
 
     if (m_isBtnCenterLongPress) {
         m_manageButton->setBtnCenterLongPress(false);
@@ -104,13 +131,15 @@ void ManageState::screenControl() {
         m_manageDisplay->setDisplayScreen (SCREEN_SETTINGS);
         
     } else {
-        if (m_selectMode == 1 || m_selectMode == 2) {
+        if (m_selectMode == 1 || m_selectMode == 2  || (m_selectMode == 6 and m_radioType == 1)) {
 
             if (m_isBtnCenterReleased and not m_fromSelectMode) {
+                cmd.previousLed = m_currentLed;
                 digitalWrite(ledPins[m_currentLed], LOW);
                 m_currentLed = (m_currentLed + 1) % 4;
                 digitalWrite(ledPins[m_currentLed], HIGH);
                 m_manageButton->setBtnCenterReleased(false);
+                cmd.currentLed = m_currentLed;
                 delay(200);
             }
 
@@ -120,24 +149,26 @@ void ManageState::screenControl() {
 
             if (m_isPressBtnRight) {
                 pulse = 1500 + servoSpeed[m_currentLed];
+                cmd.rotation = 10;
             } else if (m_isPressBtnLeft) {
                 pulse = 1500 - servoSpeed[m_currentLed];
+                cmd.rotation = 20;
             } 
     
            
-          if (m_startRecord) {
-            m_movementIndex = 0;
-            m_lastChange = millis();
-            m_startRecord = false;
-          }
-          if (abs(pulse - m_lastPulse) > 5) {
-            unsigned long now = millis();
-            if (m_movementIndex < 100) {
-              movements[m_movementIndex++] = {m_lastPulse, now - m_lastChange, m_currentLed};
+            if (m_startRecord) {
+                m_movementIndex = 0;
+                m_lastChange = millis();
+                m_startRecord = false;
             }
-            m_lastChange = now;
-            m_lastPulse = pulse;
-          }
+            if (abs(pulse - m_lastPulse) > 5) {
+                unsigned long now = millis();
+                if (m_movementIndex < 100) {
+                movements[m_movementIndex++] = {m_lastPulse, now - m_lastChange, m_currentLed};
+                }
+                m_lastChange = now;
+                m_lastPulse = pulse;
+            }
           
           servoList[m_currentLed].writeMicroseconds(pulse);
 
@@ -151,20 +182,20 @@ void ManageState::screenControl() {
                 static String command = "";
 
                 if (c == '\n') {
-                    int servoNum = command.charAt(0) - '1';
+                    uint8_t servoNum = command.charAt(0) - '1';
                     char direction = command.charAt(1);
 
                     // DEBUG
                     Serial.print("Dir: ");
                     Serial.println(direction);
 
-                    for (int i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
+                    for (uint8_t i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
                     if (servoNum >= 0 && servoNum < 4) digitalWrite(ledPins[servoNum], HIGH);
 
                     if (servoNum >= 0 && servoNum < 4) {
                         if (direction == 'L') servoList[servoNum].writeMicroseconds(1500 + servoSpeed[servoNum]);
                         else if (direction == 'R') servoList[servoNum].writeMicroseconds(1500 - servoSpeed[servoNum]);
-                        else if (direction == 'I') for (int i = 0; i < 4; i++) servoList[i].writeMicroseconds(1500);
+                        else if (direction == 'I') for (uint8_t i = 0; i < 4; i++) servoList[i].writeMicroseconds(1500);
                     }
 
                     command = ""; // reset pour le prochain message
@@ -172,8 +203,8 @@ void ManageState::screenControl() {
                     command += c;
                 }
             }
-        }  else if (m_selectMode == 5) {
-            int servoNum, rotation;
+        } else if (m_selectMode == 5) {
+            uint8_t servoNum, rotation;
             String receivedData = "";
             while (Serial1.available()) {
                 char c = Serial1.read();  
@@ -189,7 +220,7 @@ void ManageState::screenControl() {
                 } else if (receivedData == "4") {
                     servoNum = 3;
                 }
-                for (int i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
+                for (uint8_t i = 0; i < 4; i++) digitalWrite(ledPins[i], LOW);
                 if (servoNum >= 0 && servoNum < 4) digitalWrite(ledPins[servoNum], HIGH); 
 
                 if (receivedData == "5") {
@@ -207,6 +238,20 @@ void ManageState::screenControl() {
                 } else if (rotation == 30) {
                     servoList[servoNum].writeMicroseconds(1500);
                 }
+            }
+        } else if (m_selectMode == 6 and m_radioType == 2) {
+            
+            // Mise à jour LEDs
+            digitalWrite(ledPins[cmd.previousLed], LOW);
+            digitalWrite(ledPins[cmd.currentLed], HIGH);
+
+            // Mise à jour Servos
+            if (cmd.rotation == 10) {
+                servoList[cmd.currentLed].writeMicroseconds(1500 + servoSpeed[cmd.currentLed]);
+            } else if (cmd.rotation == 20) {
+                servoList[cmd.currentLed].writeMicroseconds(1500 - servoSpeed[cmd.currentLed]);
+            } else {
+                servoList[cmd.currentLed].writeMicroseconds(1500);
             }
         }
     }
@@ -308,6 +353,7 @@ void ManageState::screenSelectMode() {
 }
 
 void ManageState::screenRadio() {  
+
     if (m_isPressBtnRight) {
         if (m_selectRadio == 1) {
             if (m_radioType == 1){
@@ -316,7 +362,7 @@ void ManageState::screenRadio() {
                 m_manageDisplay->setRadioType(1);
             } 
         } else if (m_selectRadio == 2) {
-            if (m_radioKey < 100) {
+            if (m_radioKey < 10) {
                 m_radioKey++;
             } 
         }
@@ -330,22 +376,20 @@ void ManageState::screenRadio() {
         }
     }
 
+    m_address[4] = m_radioKey; 
+
     if (m_isBtnCenterPressed) {
         if (m_selectRadio < 3) {
             m_selectRadio++;
         } else if (m_selectRadio == 3) {
-            String radioMode;
-            char buffer[4];
-            sprintf(buffer, "%d", m_radioKey);
-
-            if (m_radioType == 1){
-                radioMode = String("RadioTX ") + buffer;
-            } else if (m_radioType == 2) {
-                radioMode = String("RadioRX ") + buffer;
+            char radioMode[12];
+            if (m_radioType == 1) {
+                snprintf(radioMode, sizeof(radioMode), "RadioTX %d", m_radioKey);
+            } else {
+                snprintf(radioMode, sizeof(radioMode), "RadioRX %d", m_radioKey);
             }
             
             m_manageDisplay->setModeActivated(radioMode);
-
             m_manageDisplay->setDisplayScreen (SCREEN_NORMAL);
         }   
 

@@ -24,14 +24,15 @@ class ManageDisplay {
             void oledRadioOK ();
             uint8_t getScreen ();
             void setDisplayScreen (uint8_t displayScreen);
-            void setModeActivated(String modeActivated);
-            void setModeSelected(uint8_t modeSelected);
-            void setRadioSelected(uint8_t selectRadio);
-            void setRadioKey(uint8_t radioKey);
-            void setRadioType(uint8_t radioType);
-            uint8_t getRadioType();
+            void setModeActivated (String modeActivated);
+            void setModeSelected (uint8_t modeSelected);
+            void setRadioSelected (uint8_t selectRadio);
+            void setRadioKey (uint8_t radioKey);
+            void setRadioType (uint8_t radioType);
+            uint8_t getRadioType ();
+            uint8_t getSelectMode ();
             void updateScreen ();
-            void menuPosition(uint8_t modeSelected, const char* name, uint8_t positionX, uint8_t positionY, uint8_t bloc);
+            void menuPosition (uint8_t modeSelected, const char* name, uint8_t positionX, uint8_t positionY, uint8_t bloc);
 
       private:
             uint8_t m_radioType;
